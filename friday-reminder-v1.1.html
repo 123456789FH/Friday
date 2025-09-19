@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>تذكير الجمعة | سورة الكهف والصلاة على النبي</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0f172a;        /* slate-900 */
+    --card: #111827;      /* gray-900 */
+    --accent: #22d3ee;    /* cyan-400 */
+    --accent-2:#a78bfa;   /* violet-400 */
+    --text: #e5e7eb;      /* gray-200 */
+    --muted:#94a3b8;      /* slate-400 */
+    --success:#34d399;    /* emerald-400 */
+    --warn:#f59e0b;       /* amber-500 */
+    --danger:#fb7185;     /* rose-400 */
+  }
+  body { font-family: "Cairo", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; }
+  .glow {
+    box-shadow: 0 0 0px rgba(34,211,238,0.0), 0 0 0px rgba(167,139,250,0.0);
+    animation: glow 6s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100% { box-shadow: 0 0 0px rgba(34,211,238,0), 0 0 0px rgba(167,139,250,0); }
+    50% { box-shadow: 0 0 40px rgba(34,211,238,0.25), 0 0 30px rgba(167,139,250,0.25); }
+  }
+  .grad {
+    background: radial-gradient(1200px 600px at 80% -10%, rgba(34,211,238,0.15), transparent 60%),
+                radial-gradient(900px 500px at 10% 110%, rgba(167,139,250,0.12), transparent 55%),
+                radial-gradient(600px 400px at 90% 60%, rgba(52,211,153,0.10), transparent 50%),
+                linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+  }
+  .chip { backdrop-filter: blur(8px); }
+  .btn {
+    transition: transform .12s ease, box-shadow .2s ease, background-color .2s ease;
+  }
+  .btn:active { transform: translateY(1px) scale(0.99); }
+  .ring-soft { box-shadow: 0 0 0 4px rgba(34,211,238,0.12); }
+  .time-seg { min-width: 70px; }
+  @media (max-width: 420px){
+    .time-seg { min-width: 60px; }
+  }
+</style>
+</head>
+<body class="min-h-screen grad text-[color:var(--text)] selection:bg-cyan-300 selection:text-slate-900">
+
+  <main class="max-w-5xl mx-auto px-4 py-10 md:py-14">
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+      <div class="space-y-2">
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
+          تذكير الجمعة
+        </h1>
+        <p class="text-[color:var(--muted)]">
+          ذكّر نفسك بقراءة سورة الكهف والإكثار من الصلاة على النبي ﷺ كل يوم جمعة.
+        </p>
+      </div>
+
+      <!-- Local time and timezone -->
+      <div class="chip bg-white/5 border border-white/10 rounded-2xl px-5 py-3 flex items-center gap-3">
+        <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-cyan-400/15 text-cyan-300">
+          🕒
+        </span>
+        <div class="leading-tight">
+          <div id="nowTime" class="font-semibold text-lg">--:--</div>
+          <div id="tzName" class="text-xs text-[color:var(--muted)] truncate max-w-[40ch]">المنطقة الزمنية</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Next Friday Countdown -->
+    <section class="grid md:grid-cols-2 gap-6 md:gap-8 mb-10">
+      <div class="glow bg-[color:var(--card)]/70 border border-white/10 rounded-3xl p-6 md:p-7">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-xl bg-violet-400/15 text-violet-300 inline-flex items-center justify-center">📖</span>
+            <div>
+              <h2 class="font-bold text-xl">سورة الكهف</h2>
+              <p class="text-sm text-[color:var(--muted)]">موصى بها يوم الجمعة</p>
+            </div>
+          </div>
+          <span id="kahfStatus" class="text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10">قيد الانتظار</span>
+        </div>
+
+        <div class="mt-5">
+          <p class="text-sm text-[color:var(--muted)] mb-3">الوقت المتبقي حتى الجمعة القادمة:</p>
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="time-seg bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-center">
+              <div id="dDays" class="text-2xl font-extrabold">--</div>
+              <div class="text-xs text-[color:var(--muted)]">يوم</div>
+            </div>
+            <div class="time-seg bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-center">
+              <div id="dHours" class="text-2xl font-extrabold">--</div>
+              <div class="text-xs text-[color:var(--muted)]">ساعة</div>
+            </div>
+            <div class="time-seg bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-center">
+              <div id="dMins" class="text-2xl font-extrabold">--</div>
+              <div class="text-xs text-[color:var(--muted)]">دقيقة</div>
+            </div>
+            <div class="time-seg bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-center">
+              <div id="dSecs" class="text-2xl font-extrabold">--</div>
+              <div class="text-xs text-[color:var(--muted)]">ثانية</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button id="markKahf" class="btn px-5 py-2.5 rounded-xl bg-emerald-500/90 hover:bg-emerald-500 text-slate-900 font-semibold">
+            تم قراءة سورة الكهف
+          </button>
+          <button id="openKahf" class="btn px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold">
+            فتح نص السورة
+          </button>
+        </div>
+      </div>
+
+      <div class="glow bg-[color:var(--card)]/70 border border-white/10 rounded-3xl p-6 md:p-7">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-xl bg-cyan-400/15 text-cyan-300 inline-flex items-center justify-center">💖</span>
+            <div>
+              <h2 class="font-bold text-xl">الصلاة على النبي ﷺ</h2>
+              <p class="text-sm text-[color:var(--muted)]">أكثر منها يوم الجمعة</p>
+            </div>
+          </div>
+          <span id="salatStatus" class="text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10">قيد الانتظار</span>
+        </div>
+
+        <div class="mt-5">
+          <p class="text-sm text-[color:var(--muted)] mb-3">عدّاد بسيط للمداومة اليوم:</p>
+          <div class="flex items-center gap-4">
+            <button id="minus" class="btn w-10 h-10 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white text-lg">−</button>
+            <div class="px-5 py-3 rounded-2xl bg-white/5 border border-white/10 text-3xl font-extrabold min-w-[5.5rem] text-center" id="count">0</div>
+            <button id="plus" class="btn w-10 h-10 rounded-xl bg-emerald-500/90 hover:bg-emerald-500 text-slate-900 text-lg">+</button>
+            <button id="reset" class="btn px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white text-sm">تصفير</button>
+          </div>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button id="markSalat" class="btn px-5 py-2.5 rounded-xl bg-emerald-500/90 hover:bg-emerald-500 text-slate-900 font-semibold">
+            تم الإكثار اليوم
+          </button>
+          <button id="sendSalat" class="btn px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold">
+            الصلاة على النبي ﷺ
+          </button>
+        </div>
+
+        <!-- يظهر هنا نص الصيغة عند الضغط -->
+        <div id="salatPhraseBox" class="mt-3 hidden">
+          <div class="rounded-2xl bg-white/5 border border-white/10 p-4 text-sm leading-7 text-white/90 flex items-start justify-between gap-3">
+            <span id="salatPhraseText" class="flex-1"></span>
+            <button id="copySalat" class="btn shrink-0 px-3 py-1.5 rounded-xl bg-emerald-500/90 hover:bg-emerald-500 text-slate-900 text-xs font-semibold">نسخ</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reminders & Settings -->
+    <section class="glow bg-[color:var(--card)]/70 border border-white/10 rounded-3xl p-6 md:p-8">
+      <div class="flex items-center justify-between gap-4 mb-5">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-xl bg-emerald-400/15 text-emerald-300 inline-flex items-center justify-center">🔔</span>
+          <h3 class="font-bold text-xl">التنبيهات المتكررة كل جمعة</h3>
+        </div>
+        <span id="notifyState" class="text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10">الإشعارات: غير مفعّلة</span>
+      </div>
+
+      <p class="text-[color:var(--muted)] mb-4">
+        يسمح التطبيق بإظهار تنبيهين كل يوم جمعة (محليًا على جهازك): واحد بعد الفجر لقراءة الكهف، وآخر قبل صلاة الجمعة للتذكير بالصلاة على النبي ﷺ.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+          <label class="block text-sm text-[color:var(--muted)] mb-1">توقيت تذكير سورة الكهف</label>
+          <input id="timeKahf" type="time" class="w-full rounded-xl bg-slate-800/60 border border-white/10 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400" />
+          <p class="text-xs text-[color:var(--muted)] mt-2">اقتراح: 06:30 صباحًا</p>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
+          <label class="block text-sm text-[color:var(--muted)] mb-1">توقيت تذكير الصلاة على النبي</label>
+          <input id="timeSalat" type="time" class="w-full rounded-xl bg-slate-800/60 border border-white/10 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-400" />
+          <p class="text-xs text-[color:var(--muted)] mt-2">اقتراح: 11:30 صباحًا</p>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-4 flex flex-col justify-between">
+          <div>
+            <label class="block text-sm text-[color:var(--muted)] mb-1">تشغيل/إيقاف الإشعارات</label>
+            <button id="toggleNotify" class="btn w-full px-4 py-2 rounded-xl bg-cyan-500/90 hover:bg-cyan-500 text-slate-900 font-semibold">
+              تفعيل الإشعارات
+            </button>
+          </div>
+          <p class="text-xs text-[color:var(--muted)] mt-3">ستُفتح نافذة إذن الإشعارات. يجب إبقاء الصفحة مفتوحة أو مثبّتة.</p>
+        </div>
+      </div>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button id="saveTimes" class="btn px-5 py-2.5 rounded-xl bg-emerald-500/90 hover:bg-emerald-500 text-slate-900 font-semibold">حفظ الإعدادات</button>
+        <button id="testNotify" class="btn px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-white font-semibold">إشعار تجريبي</button>
+      </div>
+
+      <p class="mt-4 text-xs text-[color:var(--muted)]">
+        ملاحظة: الإشعارات تعمل داخل المتصفح فقط. بسبب قيود الأمان، لا يمكن للتطبيق تشغيل صوت. إن أغلقْتَ الصفحة قد لا تظهر الإشعارات في بعض المتصفحات.
+      </p>
+    </section>
+
+    <!-- History -->
+    <section class="mt-8">
+      <h3 class="font-bold text-lg mb-3">سجل الإنجاز</h3>
+      <div id="history" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-10 text-center text-[color:var(--muted)] text-sm">
+      <div class="flex flex-col items-center gap-1">
+        <div>جعلنا الله وإياكم من الذاكرين المتدبرين. 🌙</div>
+        <div class="text-xs text-cyan-300/90 bg-white/5 border border-white/10 rounded-full px-3 py-1 inline-flex items-center gap-1">
+          <span>برمجة:</span>
+          <span class="font-semibold text-cyan-300">أ/ فاطمة هزازي</span>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+<script>
+  // Utilities
+  const $ = (s, p=document)=>p.querySelector(s);
+  const $$ = (s, p=document)=>Array.from(p.querySelectorAll(s));
+  const store = {
+    get(k, fallback){ try{ const v=localStorage.getItem(k); return v? JSON.parse(v): fallback; }catch{ return fallback; } },
+    set(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+  };
+
+  // Time & Countdown
+  function getNextFridayAt(hour=0, minute=0){
+    // Simpler & more reliable: always pick the next future Friday at [hour:minute]
+    const now = new Date();
+    const target = new Date(now);
+    const delta = (5 - now.getDay() + 7) % 7; // 5 = Friday
+    target.setDate(now.getDate() + delta);
+    target.setHours(hour, minute, 0, 0);
+    if (target <= now) {
+      target.setDate(target.getDate() + 7);
+    }
+    return target;
+  }
+
+  function diffParts(target){
+    const now = new Date();
+    let ms = target - now;
+    if(ms < 0) ms = 0;
+    const sec = Math.floor(ms/1000);
+    const days = Math.floor(sec / 86400);
+    const hours = Math.floor((sec % 86400)/3600);
+    const mins = Math.floor((sec % 3600)/60);
+    const secs = sec % 60;
+    return {days, hours, mins, secs};
+  }
+
+  function tickNow(){
+    const now = new Date();
+    const opts = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    $("#nowTime").textContent = now.toLocaleTimeString([], opts);
+  }
+
+  // Load settings or defaults
+  const defaults = { timeKahf: "06:30", timeSalat: "11:30", enabled: false, count: 0, history: [] };
+  const state = store.get('fridayApp', defaults);
+
+  // Apply settings to UI
+  $("#timeKahf").value = state.timeKahf || defaults.timeKahf;
+  $("#timeSalat").value = state.timeSalat || defaults.timeSalat;
+  $("#count").textContent = state.count || 0;
+  updateNotifyState();
+
+  // Timezone
+  try {
+    $("#tzName").textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || "منطقتك الزمنية";
+  } catch {
+    $("#tzName").textContent = "منطقتك الزمنية";
+  }
+
+  // Countdown setup
+  let nextFridayMidnight = getNextFridayAt(0,0);
+  function tickCountdown(){
+    if(new Date() > nextFridayMidnight){
+      nextFridayMidnight = getNextFridayAt(0,0);
+    }
+    const {days, hours, mins, secs} = diffParts(nextFridayMidnight);
+    $("#dDays").textContent = days;
+    $("#dHours").textContent = hours.toString().padStart(2,'0');
+    $("#dMins").textContent = mins.toString().padStart(2,'0');
+    $("#dSecs").textContent = secs.toString().padStart(2,'0');
+  }
+
+  // Salat counter actions
+  $("#plus").addEventListener("click", ()=>{
+    state.count = (state.count||0) + 1;
+    $("#count").textContent = state.count;
+    persist();
+  });
+  $("#minus").addEventListener("click", ()=>{
+    state.count = Math.max(0, (state.count||0) - 1);
+    $("#count").textContent = state.count;
+    persist();
+  });
+  $("#reset").addEventListener("click", ()=>{
+    state.count = 0;
+    $("#count").textContent = state.count;
+    persist();
+  });
+
+  // History rendering
+  function renderHistory(){
+    const box = $("#history");
+    box.innerHTML = "";
+    const items = (state.history||[]).slice(-6).reverse();
+    if(items.length===0){
+      const empty = document.createElement("div");
+      empty.className = "col-span-full text-center text-[color:var(--muted)] bg-white/5 border border-white/10 rounded-2xl p-6";
+      empty.textContent = "لا يوجد سجل بعد. ابدأ إنجازاتك من الجمعة القادمة بإذن الله.";
+      box.appendChild(empty);
+      return;
+    }
+    items.forEach((h)=>{
+      const card = document.createElement("div");
+      card.className = "rounded-2xl bg-white/5 border border-white/10 p-4 space-y-2";
+      const d = new Date(h.date);
+      const title = d.toLocaleDateString([], { weekday:'long', year:'numeric', month:'short', day:'numeric' });
+      card.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="font-semibold">\${title}</div>
+          <span class="text-xs px-2 py-1 rounded-full \${h.kahf?'bg-emerald-500/20 text-emerald-300':'bg-white/10 text-[color:var(--muted)]'}">سورة الكهف</span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <div class="text-[color:var(--muted)]">عدد الصلوات على النبي ﷺ</div>
+          <div class="font-bold">\${h.salatCount||0}</div>
+        </div>
+      `;
+      box.appendChild(card);
+    });
+  }
+
+  // Mark actions
+  $("#markKahf").addEventListener("click", ()=>{
+    const entry = ensureTodayEntry();
+    entry.kahf = true;
+    persist();
+    updateStatuses();
+    toast("تم تسجيل قراءة سورة الكهف. تقبل الله.");
+  });
+
+  $("#markSalat").addEventListener("click", ()=>{
+    const entry = ensureTodayEntry();
+    entry.salatCount = state.count||0;
+    persist();
+    updateStatuses();
+    toast("تم تسجيل إنجاز اليوم في الصلاة على النبي ﷺ.");
+  });
+
+  // Open resources safely in new tab
+  $("#openKahf").addEventListener("click", ()=>{
+    window.open("https://quran.com/18?reading=true", "_blank", "noopener,noreferrer");
+  });
+
+  // Salawat phrases pool (kept for future use)
+  const phrases = [
+    "اللهم صلِّ وسلم على نبينا محمد",
+    "اللهم صلِّ على محمد وعلى آل محمد",
+    "اللهم صلِّ وسلم وبارك على سيدنا محمد",
+    "اللهم صلِّ صلاةً كاملةً وسلِّم سلامًا تامًا على سيدنا محمد"
+  ];
+
+  // Show the full salawat text when pressing the button
+  const fullSalat = "اللهم صل على محمد وعلى آل محمد، كما صليت على إبراهيم، وعلى آل إبراهيم، إنك حميد مجيد، اللهم بارك على محمد، وعلى آل محمد كما باركت على إبراهيم، وعلى آل إبراهيم إنك حميد مجيد";
+  $("#sendSalat").addEventListener("click", ()=>{
+    $("#salatPhraseText").textContent = fullSalat;
+    $("#salatPhraseBox").classList.remove("hidden");
+    toast("تم عرض الصيغة الكاملة للصلاة على النبي ﷺ.");
+  });
+
+  // Copy action for the shown phrase
+  $("#copySalat").addEventListener("click", ()=>{
+    copyToClipboard(fullSalat, ()=> toast("تم نسخ الصيغة. شاركي الأجر!"));
+  });
+
+  // Notifications
+  function supportedNotifications(){
+    return "Notification" in window;
+  }
+  function updateNotifyState(){
+    const el = $("#notifyState");
+    const on = !!state.enabled;
+    el.textContent = "الإشعارات: " + (on? "مفعّلة":"غير مفعّلة");
+    el.className = "text-xs px-3 py-1 rounded-full " + (on? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30":"bg-white/5 border border-white/10");
+    $("#toggleNotify").textContent = on? "إيقاف الإشعارات":"تفعيل الإشعارات";
+  }
+
+  $("#toggleNotify").addEventListener("click", async ()=>{
+    if(!supportedNotifications()){
+      toast("متصفحك لا يدعم الإشعارات.");
+      return;
+    }
+    if(!state.enabled){
+      try{
+        const perm = await Notification.requestPermission();
+        if(perm !== "granted"){
+          toast("لم يتم منح الإذن بالإشعارات.");
+          return;
+        }
+        state.enabled = true;
+        persist();
+        updateNotifyState();
+        scheduleAll();
+        toast("تم تفعيل الإشعارات الأسبوعية. ابقِ الصفحة مفتوحة.");
+      }catch(e){
+        toast("تعذّر تفعيل الإشعارات.");
+      }
+    } else {
+      state.enabled = false;
+      clearAllSchedules();
+      persist();
+      updateNotifyState();
+      toast("تم إيقاف الإشعارات.");
+    }
+  });
+
+  $("#saveTimes").addEventListener("click", ()=>{
+    const tK = $("#timeKahf").value || defaults.timeKahf;
+    const tS = $("#timeSalat").value || defaults.timeSalat;
+    state.timeKahf = tK;
+    state.timeSalat = tS;
+    persist();
+    clearAllSchedules();
+    if(state.enabled) scheduleAll();
+    toast("تم حفظ الإعدادات.");
+  });
+
+  $("#testNotify").addEventListener("click", ()=>{
+    if(!state.enabled){
+      toast("فعّل الإشعارات أولًا.");
+      return;
+    }
+    showNotification("تجربة الإشعار", { body: "هذا إشعار تجريبي يعمل الآن ✅" });
+  });
+
+  function showNotification(title, opts){
+    try{
+      new Notification(title, opts);
+    }catch{
+      toast(title + (opts?.body? " - " + opts.body : ""));
+    }
+  }
+
+  // Simple in-tab scheduler (works while tab open)
+  let timers = [];
+  function clearAllSchedules(){
+    timers.forEach(id=> clearTimeout(id));
+    timers = [];
+  }
+  function parseHM(hm){
+    const [h,m] = (hm||"00:00").split(":").map(x=>parseInt(x,10)||0);
+    return {h,m};
+  }
+  function nextFridayAtHM(hm){
+    const {h,m} = parseHM(hm);
+    return getNextFridayAt(h,m);
+  }
+  function scheduleOnce(title, body, when){
+    const now = new Date();
+    const diff = when - now;
+    if(diff <= 0){ return; }
+    const id = setTimeout(()=>{
+      showNotification(title, { body });
+      const next = new Date(when); next.setDate(next.getDate()+7);
+      scheduleOnce(title, body, next);
+    }, diff);
+    timers.push(id);
+  }
+  function scheduleAll(){
+    clearAllSchedules();
+    const t1 = nextFridayAtHM(state.timeKahf || defaults.timeKahf);
+    scheduleOnce("تذكير سورة الكهف", "فضيلة قراءة سورة الكهف يوم الجمعة 🌟", t1);
+    const t2 = nextFridayAtHM(state.timeSalat || defaults.timeSalat);
+    scheduleOnce("تذكير بالصلاة على النبي ﷺ", "أكثر من الصلاة على النبي في يوم الجمعة 💖", t2);
+  }
+
+  // Status chips reflect today's progress if it's Friday
+  function isTodayFriday(){ return new Date().getDay() === 5; }
+  function ensureTodayEntry(){
+    const todayStr = new Date().toDateString();
+    let history = state.history || [];
+    let found = history.find(h=> new Date(h.date).toDateString() === todayStr);
+    if(!found){
+      found = { date: new Date().toISOString(), kahf: false, salatCount: 0 };
+      history.push(found);
+      state.history = history;
+    }
+    return found;
+  }
+  function updateStatuses(){
+    const todayStr = new Date().toDateString();
+    const today = (state.history||[]).find(h=> new Date(h.date).toDateString() === todayStr);
+    const kahfChip = $("#kahfStatus");
+    const salatChip = $("#salatStatus");
+
+    if(isTodayFriday() && today?.kahf){
+      kahfChip.textContent = "مُنجَز اليوم";
+      kahfChip.className = "text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+    } else if(isTodayFriday()){
+      kahfChip.textContent = "قيد الانتظار";
+      kahfChip.className = "text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10";
+    } else {
+      kahfChip.textContent = "ينتظر يوم الجمعة";
+      kahfChip.className = "text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10";
+    }
+
+    if(isTodayFriday() && (today?.salatCount||0) > 0){
+      salatChip.textContent = "مُنجَز اليوم";
+      salatChip.className = "text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+    } else if(isTodayFriday()){
+      salatChip.textContent = "قيد الانتظار";
+      salatChip.className = "text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10";
+    } else {
+      salatChip.textContent = "ينتظر يوم الجمعة";
+      salatChip.className = "text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10";
+    }
+
+    renderHistory();
+  }
+
+  // Toast
+  const toastBox = document.createElement("div");
+  toastBox.className = "fixed bottom-5 left-1/2 -translate-x-1/2 z-50 space-y-2 w-[min(92vw,520px)]";
+  document.body.appendChild(toastBox);
+
+  function toast(msg, type="info"){
+    const colors = {
+      info: "bg-slate-900/90 border-white/10 text-white",
+      success: "bg-emerald-600/90 border-emerald-300/20 text-white",
+      warn: "bg-amber-600/90 border-amber-300/20 text-white",
+      danger: "bg-rose-600/90 border-rose-300/20 text-white",
+    };
+    const div = document.createElement("div");
+    div.className = `rounded-2xl px-4 py-3 border \${colors[type]||colors.info} shadow-lg`;
+    div.textContent = msg;
+    toastBox.appendChild(div);
+    setTimeout(()=> {
+      div.style.transition = "opacity .4s ease, transform .4s ease";
+      div.style.opacity = "0";
+      div.style.transform = "translateY(6px)";
+      setTimeout(()=> div.remove(), 420);
+    }, 2600);
+  }
+
+  // Clipboard helper
+  function copyToClipboard(text, cb){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(cb).catch(()=>{ cb&&cb(); });
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch {}
+      document.body.removeChild(ta);
+      cb && cb();
+    }
+  }
+
+  // Daily rollover: reset salat counter when new day starts
+  function scheduleMidnightReset(){
+    const now = new Date();
+    const next = new Date(now);
+    next.setHours(24,0,0,0);
+    const diff = next - now;
+    setTimeout(()=>{
+      state.count = 0;
+      persist();
+      $("#count").textContent = 0;
+      updateStatuses();
+      scheduleMidnightReset();
+    }, diff);
+  }
+
+  function persist(){
+    store.set('fridayApp', state);
+  }
+
+  // Init
+  tickNow();
+  setInterval(tickNow, 1000);
+  tickCountdown();
+  setInterval(tickCountdown, 1000);
+  updateStatuses();
+  renderHistory();
+  scheduleMidnightReset();
+  if(state.enabled){ scheduleAll(); }
+</script>
+</body>
+</html>
